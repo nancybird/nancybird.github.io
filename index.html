@@ -197,12 +197,13 @@ footer a{color:var(--color-text-muted);}
     </div>
   </section>
 
-  <section id="publications">
+ <section id="publications">
     <div class="container">
       <h2>Publications</h2>
+      <p class="pub-filter-note">Showing publications from the last 3 years.</p>
       <p class="pub-loading" id="pub-status">Loading publications from ORCID…</p>
       <ul id="pub-list"></ul>
-      <p class="pub-fallback">Full record on <a href="https://orcid.org/0000-0003-2596-874X" target="_blank" rel="noopener noreferrer">ORCID</a>.</p>
+      <p class="pub-fallback">Full record on <a href="https://orcid.org/YOUR-ORCID-ID" target="_blank" rel="noopener noreferrer">ORCID</a>.</p>
     </div>
   </section>
 
@@ -215,7 +216,9 @@ footer a{color:var(--color-text-muted);}
           <svg viewBox="0 0 600 530" fill="currentColor"><path d="M135.72 44.03C202.216 93.951 273.74 195.17 300 249.49c26.262-54.316 97.782-155.54 164.28-205.46C512.26 8.009 590 -19.862 590 68.825c0 17.766-10.19 149.312-16.185 170.646-20.803 74.043-96.62 92.949-164.111 81.514 117.914 20.062 147.947 86.512 83.111 152.966-123.088 126.727-176.914-31.815-190.717-72.454-2.529-7.45-3.71-10.94-3.729-7.99-.019-2.95-1.2 .54-3.729 7.99-13.803 40.639-67.629 199.181-190.717 72.454-64.836-66.454-34.803-132.904 83.111-152.966-67.491 11.435-143.308-7.471-164.111-81.514C20.19 218.137 10 86.591 10 68.825 10-19.862 87.74 8.009 135.72 44.03Z"/></svg>
           <a href="https://bsky.app/profile/nancybird1.bsky.social" target="_blank" rel="noopener noreferrer">@nancybird1.bsky.social</a>
         </div>
-        <iframe class="bsky-embed-frame" src="https://embed.bsky.app/profile/nancybird1.bsky.social" loading="lazy" title="Bluesky feed for Nancy Bird"></iframe>
+        <div class="bsky-embed-body">
+          <bsky-embed username="nancybird1.bsky.social" limit="5" mode="auto"></bsky-embed>
+        </div>
       </div>
     </div>
   </section>
@@ -227,6 +230,7 @@ footer a{color:var(--color-text-muted);}
   </div>
 </footer>
 
+<script type="module" src="https://cdn.jsdelivr.net/npm/bsky-embed@0.0.5/dist/bsky-embed.es.js" async></script>
 <script>
 (function(){
   const t = document.getElementById('theme-toggle'), r = document.documentElement;
@@ -243,21 +247,37 @@ footer a{color:var(--color-text-muted);}
   });
 })();
 
-
+// ORCID works — replace YOUR-ORCID-ID below with your actual ORCID iD, e.g. 0000-0002-1234-5678
 (function(){
   const ORCID_ID = '0000-0003-2596-874X';
+  const YEARS_BACK = 3; // change this number to show more/fewer years
   const listEl = document.getElementById('pub-list');
   const statusEl = document.getElementById('pub-status');
   document.getElementById('orcid-link').href = 'https://orcid.org/' + ORCID_ID;
   document.querySelector('.pub-fallback a').href = 'https://orcid.org/' + ORCID_ID;
 
+
+
+  const cutoffYear = new Date().getFullYear() - YEARS_BACK;
+
   fetch('https://pub.orcid.org/v3.0/' + ORCID_ID + '/works', { headers: { 'Accept': 'application/json' } })
     .then(function(res){ if(!res.ok) throw new Error('ORCID fetch failed'); return res.json(); })
     .then(function(data){
-      const groups = (data.group || []).slice(0, 25);
-      if (!groups.length) { statusEl.textContent = 'No publications found on ORCID record.'; return; }
+      const allGroups = data.group || [];
+      const filtered = allGroups.filter(function(g){
+        const summary = g['work-summary'][0];
+        const yearStr = summary['publication-date'] && summary['publication-date'].year ? summary['publication-date'].year.value : null;
+        if (!yearStr) return false;
+        return parseInt(yearStr, 10) >= cutoffYear;
+      }).sort(function(a, b){
+        const ya = parseInt(a['work-summary'][0]['publication-date'].year.value, 10);
+        const yb = parseInt(b['work-summary'][0]['publication-date'].year.value, 10);
+        return yb - ya;
+      });
+
+      if (!filtered.length) { statusEl.textContent = 'No publications found in the last ' + YEARS_BACK + ' years.'; return; }
       statusEl.remove();
-      groups.forEach(function(g){
+      filtered.forEach(function(g){
         const summary = g['work-summary'][0];
         const title = summary.title && summary.title.title ? summary.title.title.value : 'Untitled';
         const year = summary['publication-date'] && summary['publication-date'].year ? summary['publication-date'].year.value : '';
