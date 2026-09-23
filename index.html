@@ -121,20 +121,73 @@ h1 {
   margin-top: .9rem;
   max-width: 46ch;
 }
+#about .container {
+  display: grid;
+  grid-template-columns: minmax(130px, 180px) minmax(0, 700px);
+  column-gap: clamp(2rem, 6vw, 5rem);
+  justify-content: start;
+}
 
+#about h2 {
+  grid-column: 1;
+  grid-row: 1 / span 10;
+  position: sticky;
+  top: 6rem;
+  align-self: start;
+}
+
+#about p {
+  grid-column: 2;
+}
+
+@media (max-width: 700px) {
+  #about .container {
+    display: block;
+  }
+
+  #about h2 {
+    position: static;
+  }
+}
+  
 section{padding-block:clamp(2rem,5vw,3.5rem);border-top:1px solid var(--color-divider);}
 section h2{font-family:var(--font-display);font-weight:500;font-size:clamp(1.5rem,1.2rem + 1vw,1.9rem);margin-bottom:1.1rem;letter-spacing:-.005em;}
 section p{max-width:68ch;color:var(--color-text);}
 section p + p{margin-top:.9rem;}
 
-.software-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:1rem;}
-@media(min-width:600px){.software-grid{grid-template-columns:1fr 1fr;}}
-.software-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:1.25rem 1.4rem;box-shadow:var(--shadow-sm);transition:box-shadow .2s ease,transform .2s ease;}
-.software-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
-.software-card h3{font-size:1.05rem;font-weight:600;margin-bottom:.4rem;}
-.software-card p{font-size:.92rem;color:var(--color-text-muted);margin-bottom:.8rem;}
-.software-card a{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:600;text-decoration:none;color:var(--color-primary);}
-.software-card a:hover{color:var(--color-primary-hover);}
+.software-grid {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.software-card {
+  border: 0;
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  box-shadow: none;
+  transition: transform .2s ease;
+}
+
+.software-card:first-child {
+  background: var(--color-sky);
+}
+
+.software-card:nth-child(2) {
+  background: var(--color-peach);
+}
+
+.software-card:hover {
+  box-shadow: none;
+  transform: translateY(-3px);
+}
+
+@media (max-width: 600px) {
+  .software-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 #publications ul{list-style:none;margin-top:.5rem;}
 #publications li{padding:.9rem 0;border-bottom:1px solid var(--color-divider);font-size:.95rem;}
