@@ -7,7 +7,7 @@ layout: null
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nancy Bird</title>
-<meta name="description" content="Population genetics, method development, demographin inference">
+<meta name="description" content="Population genetics, method development, demographic inference">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=zodiak@400,500&display=swap" rel="stylesheet">
@@ -284,7 +284,7 @@ footer a{color:var(--color-text-muted);}
       <h2>About</h2>
       <p>I’m a computational biologist and population geneticist interested in how genomic data can help us understand population history, movement and adaptation in both humans and wildlife.</p>
       <p>I am currently a postdoctoral researcher in <a href="https://research-portal.uea.ac.uk/en/persons/anders-bergstr%C3%B6m/">Dr Anders Bergström’s</a> group at the <a href="https://research-portal.uea.ac.uk/en/persons/nancy-bird/">University of East Anglia</a> in Norwich, where I study genomic data from red foxes sampled across the UK. The project is particularly focused on the impact of urbanisation on gene flow and adaptation in foxes, with the broader aim of understanding how expanding urban environments shape wild populations.</p>
-      <p>Before joining UEA, I completed my PhD (2019-2023) and subsequent post-doc (2023-2026) with <a href="https://hellenthal-group-ucl.github.io/hellenthal-group/">Prof. Garrett Hellenthal</a> at UCL. My work focused on human population genetics, particularly population structure, admixture and archaic ancestry. This included developing several computational methods, for example an approach for admixture dating in ancient DNA. I have also worked extensively on inferring archaic introgression, developing a novel method to determine archaic segments in modern genomes. For my PhD, I focused on fine-scale population structure in regions of West and Central Africa, and was interested in correlating genetic signatures with social and historical factors to understand human history better. </p>
+      <p>Before joining UEA, I completed my PhD (2019-2023) and subsequent post-doc (2023-2026) with <a href="https://hellenthal-group-ucl.github.io/hellenthal-group/">Prof. Garrett Hellenthal</a> at UCL. My work focused on human population genetics, particularly population structure, admixture and archaic ancestry. This included developing several computational methods, for example an approach for admixture dating in ancient DNA. I have also worked extensively on inferring archaic introgression, developing a method to identify segments of archaic ancestry. For my PhD, I focused on fine-scale population structure in regions of West and Central Africa, and was interested in correlating genetic signatures with social and historical factors to understand human history better. </p>
       <p> My long-term goal is to bridge methodological population genetics and conservation genomics, adapting advances from human and aDNA research to understand the history, connectivity and adaptive potential of wildlife populations.</p>
 </div>
   </section>
@@ -301,7 +301,7 @@ footer a{color:var(--color-text-muted);}
         </article>
         <article class="software-card">
           <h3>admixplorer</h3>
-          <p>A tool for inferring the admixture date and number of pulses in a populations, including with different and uncertain sampling ages.</p>
+          <p>A tool for inferring the admixture date and number of pulses in a population, including with different and uncertain sampling ages.</p>
           <a href="https://github.com/nancybird/admixplorer" target="_blank" rel="noopener noreferrer">View on GitHub →</a>
         </article>
       </div>
@@ -361,7 +361,7 @@ footer a{color:var(--color-text-muted);}
 
   // Includes the current calendar year plus the previous two.
   const cutoffYear =
-    new Date().getFullYear() - YEARS_BACK + 1;
+    new Date().getFullYear() - YEARS_BACK;
 
   const headers = {
     Accept: 'application/json'
