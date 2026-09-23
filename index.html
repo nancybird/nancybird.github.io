@@ -12,7 +12,7 @@ layout: null
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=zodiak@400,500&display=swap" rel="stylesheet">
 <style>
-:root, [data-theme="light"] {
+:root {
   --color-bg: #f7f6f2;
   --color-surface: #f9f8f5;
   --color-surface-2: #fbfbf9;
@@ -35,26 +35,6 @@ layout: null
   --font-display: 'Zodiak', Georgia, serif;
   --font-body: 'General Sans', 'Helvetica Neue', sans-serif;
 }
-[data-theme="dark"] {
-  --color-bg: #14160f;
-  --color-surface: #191b13;
-  --color-surface-2: #1d1f17;
-  --color-surface-offset: #21231a;
-  --color-divider: #2a2c22;
-  --color-border: #35372b;
-  --color-text: #d9dbcf;
-  --color-text-muted: #949686;
-  --color-text-faint: #5e6052;
-  --color-text-inverse: #23261c;
-  --color-primary: #7fa87f;
-  --color-primary-hover: #93bb90;
-  --color-primary-active: #a8cba3;
-  --color-primary-highlight: #2b3527;
-  --color-accent2: #c99a63;
-  --shadow-sm: 0 1px 2px oklch(0 0 0 / .3);
-  --shadow-md: 0 4px 12px oklch(0 0 0 / .4);
-  --shadow-lg: 0 12px 32px oklch(0 0 0 / .5);
-}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{-webkit-text-size-adjust:none;scroll-behavior:smooth;scroll-padding-top:5rem;}
 body{font-family:var(--font-body);background:var(--color-bg);color:var(--color-text);line-height:1.6;font-size:clamp(1rem,0.95rem + 0.25vw,1.125rem);}
@@ -70,8 +50,6 @@ header.site-header{position:sticky;top:0;z-index:20;background:color-mix(in okla
 nav.main-nav{display:flex;gap:1.25rem;align-items:center;}
 nav.main-nav a{text-decoration:none;color:var(--color-text-muted);font-size:.9rem;font-weight:500;transition:color .18s ease;}
 nav.main-nav a:hover{color:var(--color-primary);}
-#theme-toggle{background:none;border:1px solid var(--color-border);border-radius:var(--radius-full);width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);cursor:pointer;}
-#theme-toggle:hover{border-color:var(--color-primary);color:var(--color-primary);}
 
 .hero{padding:clamp(3rem,7vw,5rem) 0 clamp(2rem,5vw,3rem);}
 .hero-grid{display:flex;gap:2rem;align-items:center;flex-wrap:wrap-reverse;}
@@ -135,7 +113,6 @@ footer a{color:var(--color-text-muted);}
       <a href="#software">Software</a>
       <a href="#publications">Publications</a>
       <a href="#bluesky">Bluesky</a>
-      <button id="theme-toggle" aria-label="Switch to dark mode"></button>
     </nav>
   </div>
 </header>
@@ -227,20 +204,6 @@ footer a{color:var(--color-text-muted);}
 
 <script type="module" src="https://cdn.jsdelivr.net/npm/bsky-embed@0.0.5/dist/bsky-embed.es.js" async></script>
 <script>
-(function(){
-  const t = document.getElementById('theme-toggle'), r = document.documentElement;
-  const moon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-  const sun = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-  let d = matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
-  r.setAttribute('data-theme', d);
-  t.innerHTML = d === 'dark' ? sun : moon;
-  t.addEventListener('click', function(){
-    d = d === 'dark' ? 'light' : 'dark';
-    r.setAttribute('data-theme', d);
-    t.innerHTML = d === 'dark' ? sun : moon;
-    t.setAttribute('aria-label', 'Switch to ' + (d === 'dark' ? 'light' : 'dark') + ' mode');
-  });
-})();
 
 // ORCID works — replace YOUR-ORCID-ID below with your actual ORCID iD, e.g. 0000-0002-1234-5678
 (function(){
