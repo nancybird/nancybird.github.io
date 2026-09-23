@@ -194,7 +194,22 @@ section p + p{margin-top:.9rem;}
 #publications li:last-child{border-bottom:none;}
 #publications li a{text-decoration:none;font-weight:600;color:var(--color-text);}
 #publications li a:hover{color:var(--color-primary);}
-.pub-meta{display:block;font-size:.83rem;color:var(--color-text-muted);margin-top:.2rem;}
+.pub-authors {
+  display: block;
+  margin-top: .3rem;
+  color: var(--color-text-muted);
+  font-size: .86rem;
+  line-height: 1.45;
+}
+
+.pub-meta {
+  display: block;
+  margin-top: .2rem;
+  color: var(--color-accent2);
+  font-size: .83rem;
+  font-weight: 500;
+}
+  
 .pub-loading{color:var(--color-text-muted);font-size:.9rem;}
 .pub-fallback{margin-top:.75rem;font-size:.85rem;}
 
@@ -330,54 +345,218 @@ footer a{color:var(--color-text-muted);}
 <script>
 
 // ORCID works — replace YOUR-ORCID-ID below with your actual ORCID iD, e.g. 0000-0002-1234-5678
-(function(){
+(function () {
   const ORCID_ID = '0000-0003-2596-874X';
-  const YEARS_BACK = 3; // change this number to show more/fewer years
+  const YEARS_BACK = 3;
+  const MAX_AUTHORS = 5;
+
   const listEl = document.getElementById('pub-list');
   const statusEl = document.getElementById('pub-status');
-  document.getElementById('orcid-link').href = 'https://orcid.org/' + ORCID_ID;
-  document.querySelector('.pub-fallback a').href = 'https://orcid.org/' + ORCID_ID;
 
+  document.getElementById('orcid-link').href =
+    'https://orcid.org/' + ORCID_ID;
 
+  document.querySelector('.pub-fallback a').href =
+    'https://orcid.org/' + ORCID_ID;
 
-  const cutoffYear = new Date().getFullYear() - YEARS_BACK;
+  // Includes the current calendar year plus the previous two.
+  const cutoffYear =
+    new Date().getFullYear() - YEARS_BACK + 1;
 
-  fetch('https://pub.orcid.org/v3.0/' + ORCID_ID + '/works', { headers: { 'Accept': 'application/json' } })
-    .then(function(res){ if(!res.ok) throw new Error('ORCID fetch failed'); return res.json(); })
-    .then(function(data){
-      const allGroups = data.group || [];
-      const filtered = allGroups.filter(function(g){
-        const summary = g['work-summary'][0];
-        const yearStr = summary['publication-date'] && summary['publication-date'].year ? summary['publication-date'].year.value : null;
-        if (!yearStr) return false;
-        return parseInt(yearStr, 10) >= cutoffYear;
-      }).sort(function(a, b){
-        const ya = parseInt(a['work-summary'][0]['publication-date'].year.value, 10);
-        const yb = parseInt(b['work-summary'][0]['publication-date'].year.value, 10);
-        return yb - ya;
-      });
+  const headers = {
+    Accept: 'application/json'
+  };
 
-      if (!filtered.length) { statusEl.textContent = 'No publications found in the last ' + YEARS_BACK + ' years.'; return; }
-      statusEl.remove();
-      filtered.forEach(function(g){
-        const summary = g['work-summary'][0];
-        const title = summary.title && summary.title.title ? summary.title.title.value : 'Untitled';
-        const year = summary['publication-date'] && summary['publication-date'].year ? summary['publication-date'].year.value : '';
-        const journal = summary['journal-title'] ? summary['journal-title'].value : '';
-        let url = '#';
-        if (summary.url && summary.url.value) { url = summary.url.value; }
-        else if (summary['external-ids'] && summary['external-ids']['external-id']) {
-          const doi = summary['external-ids']['external-id'].find(function(e){ return e['external-id-type'] === 'doi'; });
-          if (doi) url = 'https://doi.org/' + doi['external-id-value'];
-        }
-        const li = document.createElement('li');
-        li.innerHTML = '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + title + '</a>' +
-          '<span class="pub-meta">' + [journal, year].filter(Boolean).join(' · ') + '</span>';
-        listEl.appendChild(li);
-      });
+  function getYear(work) {
+    return work['publication-date']?.year?.value || '';
+  }
+
+  function getWorkUrl(work) {
+    if (work.url?.value) {
+      return work.url.value;
+    }
+
+    const identifiers =
+      work['external-ids']?.['external-id'] || [];
+
+    const doi = identifiers.find(function (identifier) {
+      return identifier['external-id-type'] === 'doi';
+    });
+
+    if (doi?.['external-id-url']?.value) {
+      return doi['external-id-url'].value;
+    }
+
+    if (doi?.['external-id-value']) {
+      return 'https://doi.org/' +
+        doi['external-id-value'];
+    }
+
+    return null;
+  }
+
+  function getAuthors(work) {
+    const contributors =
+      work.contributors?.contributor || [];
+
+    return contributors
+      .filter(function (contributor) {
+        const role =
+          contributor['contributor-attributes']
+            ?.['contributor-role'];
+
+        return !role || role === 'author';
+      })
+      .map(function (contributor) {
+        return contributor['credit-name']?.value;
+      })
+      .filter(Boolean);
+  }
+
+  function formatAuthors(authors) {
+    const displayed = authors.slice(0, MAX_AUTHORS);
+    let text = displayed.join(', ');
+
+    if (authors.length > MAX_AUTHORS) {
+      text += ', et al.';
+    }
+
+    return text;
+  }
+
+  function renderWork(work) {
+    const title =
+      work.title?.title?.value || 'Untitled';
+
+    const year = getYear(work);
+    const journal =
+      work['journal-title']?.value || '';
+
+    const url = getWorkUrl(work);
+    const authors = getAuthors(work);
+
+    const li = document.createElement('li');
+
+    let titleElement;
+
+    if (url) {
+      titleElement = document.createElement('a');
+      titleElement.href = url;
+      titleElement.target = '_blank';
+      titleElement.rel = 'noopener noreferrer';
+    } else {
+      titleElement = document.createElement('span');
+      titleElement.className = 'pub-title';
+    }
+
+    titleElement.textContent = title;
+    li.appendChild(titleElement);
+
+    if (authors.length) {
+      const authorElement =
+        document.createElement('span');
+
+      authorElement.className = 'pub-authors';
+      authorElement.textContent =
+        formatAuthors(authors);
+
+      li.appendChild(authorElement);
+    }
+
+    const metaElement =
+      document.createElement('span');
+
+    metaElement.className = 'pub-meta';
+    metaElement.textContent =
+      [journal, year].filter(Boolean).join(' · ');
+
+    li.appendChild(metaElement);
+    listEl.appendChild(li);
+  }
+
+  fetch(
+    'https://pub.orcid.org/v3.0/' +
+      ORCID_ID +
+      '/works',
+    { headers: headers }
+  )
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error('ORCID summary fetch failed');
+      }
+
+      return response.json();
     })
-    .catch(function(){
-      statusEl.textContent = 'Could not load publications automatically — see full list on ORCID.';
+    .then(function (data) {
+      const summaries = (data.group || [])
+        .map(function (group) {
+          return group['work-summary'][0];
+        })
+        .filter(function (summary) {
+          const year =
+            summary['publication-date']
+              ?.year?.value;
+
+          return year &&
+            parseInt(year, 10) >= cutoffYear;
+        });
+
+      if (!summaries.length) {
+        statusEl.textContent =
+          'No publications found in the selected period.';
+
+        return null;
+      }
+
+      const putCodes = summaries
+        .map(function (summary) {
+          return summary['put-code'];
+        })
+        .filter(Boolean);
+
+      return fetch(
+        'https://pub.orcid.org/v3.0/' +
+          ORCID_ID +
+          '/works/' +
+          putCodes.join(','),
+        { headers: headers }
+      );
+    })
+    .then(function (response) {
+      if (!response) {
+        return null;
+      }
+
+      if (!response.ok) {
+        throw new Error('ORCID work fetch failed');
+      }
+
+      return response.json();
+    })
+    .then(function (data) {
+      if (!data) {
+        return;
+      }
+
+      const works = (data.bulk || [])
+        .map(function (item) {
+          return item.work;
+        })
+        .filter(Boolean)
+        .sort(function (a, b) {
+          return (
+            parseInt(getYear(b), 10) -
+            parseInt(getYear(a), 10)
+          );
+        });
+
+      statusEl.remove();
+      works.forEach(renderWork);
+    })
+    .catch(function () {
+      statusEl.textContent =
+        'Could not load publications automatically — ' +
+        'see the full list on ORCID.';
     });
 })();
 </script>
